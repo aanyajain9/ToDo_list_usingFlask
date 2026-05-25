@@ -14,7 +14,7 @@ class Todo(db.Model):
     def __repr__(self)-> str:
         return f"{self.sno} - { self.title}"
 '''app means they are talking about website'''
-@app.route("/",methods=['get','POST'])
+@app.route("/",methods=['GET','POST'])
 def helloworld():
     if request.method=="POST":
         title=request.form['title']
@@ -31,11 +31,25 @@ def products():
     print(allTodo)
     return 'this is product page'
 
-@app.route('/update/<int:sno>')
+@app.route('/update/<int:sno>',methods=['GET','POST'])
 def update(sno):
-    allTodo= Todo.query.all()
-    print(allTodo)
-    return 'this is product page'
+
+    todo = Todo.query.filter_by(sno=sno).first()
+
+    if request.method == "POST":
+
+        title = request.form['title']
+        desc = request.form['desc']
+
+        todo.title = title
+        todo.desc = desc
+
+        db.session.commit()
+
+        return redirect("/")
+
+    return render_template('update.html',todo=todo)
+    
 
 @app.route('/delete/<int:sno>')
 def delete(sno):
